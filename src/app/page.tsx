@@ -31,11 +31,11 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Box display="flex" flexDirection="column" mb={4}>
         <h3>Vacancy</h3>
-        <FileUpload setFiles={setVacancy} multiple={false} files={vacancy} />
+        <FileUpload setFiles={setVacancy} multiple={false} type='vacancy'/>
       </Box>
       <Box display="flex" flexDirection="column" mb={4}>
         <h3>Resumes</h3>
-        <FileUpload setFiles={setResumes} multiple files={resumes} />
+        <FileUpload setFiles={setResumes} multiple type='resumes'/>
       </Box>
       {candidates.length > 0 && (
         <TableContainer component={Paper} style={{ marginTop: "20px" }}>
@@ -71,7 +71,7 @@ export default function Home() {
           variant="contained"
           disabled={!resumes.length || !vacancy.length}
         >
-          Найти соответствия
+          Analyze and rank
         </Button>
       </Box>
     </main>

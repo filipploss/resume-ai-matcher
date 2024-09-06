@@ -18,14 +18,11 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-export default function FileUpload({
-  setFiles,
-  files,
-  multiple,
-  // setFilenames,
-}) {
+export default function FileUpload({ setFiles, multiple, type }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [filenames, setFilenames] = useState<string[]>([]);
+
+  const fileString = multiple ? "files" : "file";
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -72,7 +69,7 @@ export default function FileUpload({
         tabIndex={-1}
         startIcon={<CloudUploadIcon />}
       >
-        <p>{loading ? "Loading..." : "Upload file"}</p>
+        <p>{loading ? "Loading..." : `Upload ${fileString}`}</p>
         <VisuallyHiddenInput
           type="file"
           multiple={multiple}
@@ -83,15 +80,14 @@ export default function FileUpload({
       </Button>
       {filenames.length > 0 && (
         <div>
-          <h3>Uploaded files:</h3>
-          <Box display="flex" flexDirection="column">
-            {filenames.map((file) => (
-              <Box key={file}>{file}</Box>
-            ))}
-          </Box>
-          {/* {files.map((text, index) => (
-            <p key={index}>{text}</p>
-          ))} */}
+          <h3>Uploaded files: {type === "resumes" && filenames.length}</h3>
+          {type === "vacancy" && (
+            <Box display="flex" flexDirection="column">
+              {filenames.map((file) => (
+                <Box key={file}>{file}</Box>
+              ))}
+            </Box>
+          )}
         </div>
       )}
     </>
