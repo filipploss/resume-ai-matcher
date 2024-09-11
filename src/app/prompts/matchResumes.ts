@@ -1,38 +1,60 @@
 export async function getMatch(resumes: string[], vacancy: string) {
   const prompt = `
-Please analyze the following resumes and the job vacancy to create a ranked table in JSON format, ranking candidates based on their relevance to the job vacancy.
-
-Resumes:
-${resumes.join("\n\n")}
+Analyze the following resumes and job vacancy to create a ranked table in JSON format, ranking candidates based on their relevance to the job vacancy.
 
 Job Vacancy:
 ${vacancy}
 
-Instructions:
-1. Rank all candidates based on their overall relevance to the job vacancy. The relevance should be determined by analyzing:
-   - How closely the candidate's experience, skills, and specialization align with the requirements and description of the job vacancy.
-   - The candidate's professional background and total years of relevant experience for the job described in the vacancy.
-   - Any relevant experience or skills that may be important for the specific job vacancy.
-   - Candidates whose skills and experience are not aligned with the job vacancy should be ranked lower, regardless of their overall experience in unrelated fields.
-   
-2. **Include all resumes in the final result, even if they are not highly relevant.** Nonspecific or less relevant resumes should be placed at the bottom of the ranked list.
-3. Ignore files that are not resumes or do not contain valid resume information.
-4. **Important: Do not exclude any resumes based on their relevance**—rank all resumes from most to least relevant.
+Resumes:
+${resumes.join("\n\n")}
 
-The table should include the following fields for each candidate:
-- fullName: Full Name
+Instructions:
+1. Rank all candidates based on their overall relevance to the job vacancy and assign them relevanceScore. Consider:
+   - Alignment of candidate's experience, skills, and specialization with job requirements.
+   - Total years of relevant experience.
+   - Any unique or particularly relevant skills for the job.
+   - Assign a relevanceScore of 0 to candidates whose skills, experience, and specialization are completely irrelevant to the job (e.g., a plumber applying for a software developer role).
+   
+2. Include all resumes in the final result, even if not highly relevant.
+3. Ignore files that are not valid resumes.
+4. **After calculating the relevanceScore for each candidate, ensure that the candidates are explicitly sorted by relevanceScore in descending order (from highest to lowest).**
+5. **Do not translate or change the names** of candidates from their original language.
+
+**Return only a valid JSON array**, sorted strictly by **relevanceScore** from highest to lowest, where each object represents a candidate with these fields:
+- fullName: Full Name (as it appears in the resume, without translation)
 - email: Email
 - linkedin: LinkedIn Profile
 - specialization: Specialization
-- experience: Total experience in specialization (in years)
-- technologies: Top 3 technologies the candidate is proficient in (if applicable), based on relevance to the job vacancy.
+- experience: Total experience in specialization (years)
+- technologies: Top 3 relevant technologies
+- relevanceScore: A score from 0 to 100 indicating relevance to the job
 
-**Return the result strictly as a valid JSON array**, where each element is an object representing a candidate. Ensure that the JSON is correctly formatted, with no additional text or formatting.
-
+**Important:**
+- Do not add any formatting such as triple backticks, markdown, or additional text.
+- Return only valid JSON without any code formatting, commentary, or explanations.
 `;
 
+  // Функция для очистки данных от ненужных символов и текста до JSON
+  function cleanResponse(responseText: string) {
+    // Находим первую строку, которая содержит открывающую скобку массива [
+    const jsonStartIndex = responseText.indexOf('[');
+    
+    // Если нашли, возвращаем только содержимое начиная с открывающей скобки
+    if (jsonStartIndex !== -1) {
+      return responseText.slice(jsonStartIndex).replace(/```json|```/g, '').trim();
+    }
+    
+    // Если не нашли открывающей скобки, возвращаем как есть (ошибка)
+    return responseText;
+  }
+
+  // Функция для сортировки кандидатов по полю relevanceScore
+  function sortCandidatesByRelevance(candidates: any[]) {
+    return candidates.sort((a, b) => b.relevanceScore - a.relevanceScore);
+  }
+
   try {
-    const response = await fetch("/api/openai", {
+    const response = await fetch("/api/anthropic", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,11 +70,12 @@ The table should include the following fields for each candidate:
 
     const data = await response.json();
     
-    // Удаление возможных ненужных символов перед парсингом JSON
-    const cleanedMessage = data.message.replace(/```json|```/g, '').trim(); // Убираем тройные кавычки
+    // Очистка данных от лишнего форматирования и парсинг в JSON
+    const cleanMessage = cleanResponse(data.message);
     
-    // Парсинг очищенного JSON
-    const candidates = JSON.parse(cleanedMessage); 
+    // Парсинг очищенных данных в JSON
+    const candidates = sortCandidatesByRelevance(JSON.parse(cleanMessage));
+    
     console.log("Candidates:", candidates);
     return candidates;
   } catch (error) {
