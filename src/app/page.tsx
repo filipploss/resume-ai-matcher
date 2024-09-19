@@ -12,7 +12,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "../../utils/supabaseClient"; // Подключение клиента Supabase
+import { supabase } from "../../utils/supabaseClient";
 import FileUpload from "./components/FileUpload";
 import { getMatch } from "./prompts/matchResumes";
 
@@ -20,10 +20,9 @@ export default function HomePage() {
   const [vacancy, setVacancy] = useState<string[]>([]);
   const [resumes, setResumes] = useState<string[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null); // Состояние для хранения пользователя
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
-  // Проверка авторизации
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -33,9 +32,9 @@ export default function HomePage() {
       }
 
       if (!data.session) {
-        router.push("/auth"); // Перенаправление на страницу входа, если пользователь не авторизован
+        router.push("/auth");
       } else {
-        setUser(data.session.user); // Установка данных пользователя
+        setUser(data.session.user);
       }
     };
 
@@ -52,13 +51,12 @@ export default function HomePage() {
     };
   }, [router]);
 
-  // Логика выхода из аккаунта
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error during sign out:", error);
     } else {
-      router.push("/auth"); // Перенаправление на страницу авторизации после выхода
+      router.push("/auth");
     }
   };
 
@@ -74,11 +72,10 @@ export default function HomePage() {
     setCandidates([]);
   };
 
-  if (!user) return <div>Loading...</div>; // Отображаем индикатор загрузки до проверки сессии
+  if (!user) return <div>Loading...</div>;
 
   return (
     <>
-      {/* Хэдер с кнопкой Logout */}
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -90,10 +87,9 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* Основная часть */}
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         {candidates.length === 0 && (
-          <>
+          <Box>
             <Box display="flex" flexDirection="column" mb={4}>
               <h3>Vacancy</h3>
               <FileUpload
@@ -104,7 +100,12 @@ export default function HomePage() {
             </Box>
             <Box display="flex" flexDirection="column" mb={4}>
               <h3>Resumes</h3>
-              <FileUpload setFiles={setResumes} multiple type="resumes" />
+              <FileUpload
+                setFiles={setResumes}
+                multiple
+                type="resumes"
+                disabled={!vacancy.length}
+              />
             </Box>
             <Box display="flex" flexDirection="column" mb={4}>
               <Button
@@ -115,7 +116,7 @@ export default function HomePage() {
                 Analyze and rank
               </Button>
             </Box>
-          </>
+          </Box>
         )}
         {candidates.length > 0 && (
           <>
@@ -141,9 +142,9 @@ export default function HomePage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {candidates.map((candidate, index) => (
+                  {candidates.map((candidate) => (
                     <TableRow
-                      key={index}
+                      key={candidate.id}
                       sx={{
                         background:
                           candidate.relevanceScore === 0 ? "lightGrey" : "",

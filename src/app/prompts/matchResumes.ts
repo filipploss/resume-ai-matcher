@@ -21,6 +21,7 @@ Instructions:
 5. **Do not translate or change the names** of candidates from their original language.
 
 **Return only a valid JSON array**, sorted strictly by **relevanceScore** from highest to lowest, where each object represents a candidate with these fields:
+- id: starting from 0
 - fullName: Full Name (as it appears in the resume, without translation)
 - email: Email
 - linkedin: LinkedIn Profile

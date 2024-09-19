@@ -18,7 +18,14 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-export default function FileUpload({ setFiles, multiple, type }) {
+type Props = {
+  setFiles: (files: string[]) => void;
+  multiple?: boolean;
+  type: "resumes" | "vacancy";
+  disabled?: boolean;
+};
+
+const FileUpload = ({ setFiles, multiple, type, disabled }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [filenames, setFilenames] = useState<string[]>([]);
 
@@ -64,6 +71,7 @@ export default function FileUpload({ setFiles, multiple, type }) {
     <>
       <Button
         component="label"
+        disabled={disabled}
         role={undefined}
         variant="contained"
         tabIndex={-1}
@@ -92,4 +100,6 @@ export default function FileUpload({ setFiles, multiple, type }) {
       )}
     </>
   );
-}
+};
+
+export default FileUpload;
