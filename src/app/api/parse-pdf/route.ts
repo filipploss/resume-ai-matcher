@@ -1,15 +1,13 @@
-// src/app/api/parse-pdf/route.ts
-
-import { NextResponse } from 'next/server';
-import pdfParse from 'pdf-parse';
+import { NextResponse } from "next/server";
+import pdfParse from "pdf-parse";
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const files = formData.getAll('files') as Blob[]; // Получаем массив файлов
+    const files = formData.getAll("files") as Blob[];
 
     if (!files || files.length === 0) {
-      return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
+      return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
     const texts = await Promise.all(
@@ -20,9 +18,12 @@ export async function POST(request: Request) {
       })
     );
 
-    return NextResponse.json({ texts }); // Возвращаем массив текстов
+    return NextResponse.json({ texts });
   } catch (error) {
-    console.error('Error parsing PDFs:', error);
-    return NextResponse.json({ error: 'Failed to parse PDFs' }, { status: 500 });
+    console.error("Error parsing PDFs:", error);
+    return NextResponse.json(
+      { error: "Failed to parse PDFs" },
+      { status: 500 }
+    );
   }
 }

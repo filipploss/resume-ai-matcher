@@ -55,7 +55,8 @@ Instructions:
   }
 
   try {
-    const response = await fetch("/api/anthropic", {
+    // const response = await fetch("/api/anthropic", {
+    const response = await fetch("/api/openRouter", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
