@@ -1,8 +1,10 @@
 "use client";
 
+import AnalyticsIcon from "@mui/icons-material/Analytics";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,6 +12,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Tooltip from "@mui/material/Tooltip";
 import { useState } from "react";
 import FileUpload from "./components/FileUpload";
 import { getMatch } from "./prompts/matchResumes";
@@ -31,6 +34,11 @@ export default function HomePage() {
     setCandidates([]);
   };
 
+  const headerCellStyles = {
+    fontWeight: "bold",
+    whiteSpace: "nowrap",
+  };
+
   return (
     <>
       <AppBar position="static">
@@ -41,7 +49,7 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <main className="flex min-h-screen flex-col items-center p-24">
         {candidates.length === 0 && (
           <Box>
             <Box display="flex" flexDirection="column" mb={4}>
@@ -66,6 +74,15 @@ export default function HomePage() {
                 onClick={handleMatchClick}
                 variant="contained"
                 disabled={!resumes.length || !vacancy.length}
+                sx={{
+                  py: 1.5,
+                  px: 4,
+                  fontWeight: "medium",
+                  textTransform: "none",
+                  borderRadius: 2,
+                  boxShadow: 2,
+                }}
+                startIcon={<AnalyticsIcon />}
               >
                 Analyze and rank
               </Button>
@@ -83,34 +100,120 @@ export default function HomePage() {
                 new analysis
               </Button>
             </Box>
-            <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-              <Table>
+            <TableContainer
+              component={Paper}
+              sx={{
+                mt: 3,
+                width: "100%",
+                maxWidth: 1200,
+                boxShadow: 2,
+                borderRadius: 2,
+                overflow: "auto",
+              }}
+            >
+              <Table size="small">
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Full Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>LinkedIn Profile</TableCell>
-                    <TableCell>Specialization</TableCell>
-                    <TableCell>Experience (Years)</TableCell>
-                    <TableCell>Top 3 Technologies</TableCell>
+                  <TableRow sx={{ backgroundColor: "primary.light" }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        py: 1.5,
+                      }}
+                    >
+                      Name
+                    </TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>Email</TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>LinkedIn</TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>Spec.</TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>Exp.</TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>
+                      Tech Stack
+                    </TableCell>
+                    <TableCell sx={{ ...headerCellStyles }}>Score</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {candidates.map((candidate) => (
+                  {candidates.map((candidate, index) => (
                     <TableRow
                       key={candidate.id}
                       sx={{
-                        background:
-                          candidate.relevanceScore === 0 ? "lightGrey" : "",
+                        backgroundColor:
+                          index % 2 === 0
+                            ? "background.default"
+                            : "background.paper",
+                        "&:hover": { backgroundColor: "action.hover" },
+                        ...(candidate.relevanceScore === 0
+                          ? { opacity: 0.7 }
+                          : {}),
                       }}
                     >
-                      <TableCell>{candidate.fullName}</TableCell>
-                      <TableCell>{candidate.email}</TableCell>
-                      <TableCell>{candidate.linkedin}</TableCell>
-                      <TableCell>{candidate.specialization}</TableCell>
-                      <TableCell>{candidate.experience}</TableCell>
-                      <TableCell>{candidate.technologies.join(", ")}</TableCell>
-                      <TableCell>{candidate.relevanceScore}</TableCell>
+                      <TableCell sx={{ py: 1 }}>{candidate.fullName}</TableCell>
+                      <TableCell
+                        sx={{
+                          py: 1,
+                          maxWidth: 150,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        <Tooltip title={candidate.email}>
+                          <span>{candidate.email}</span>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {candidate.linkedin ? (
+                          <Tooltip title={candidate.linkedin}>
+                            <Link
+                              href={candidate.linkedin}
+                              target="_blank"
+                              rel="noopener"
+                              sx={{ textDecoration: "none" }}
+                            >
+                              Profile
+                            </Link>
+                          </Tooltip>
+                        ) : (
+                          "N/A"
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {candidate.specialization}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {candidate.experience}
+                      </TableCell>
+                      <TableCell sx={{ py: 1, maxWidth: 200 }}>
+                        <Tooltip title={candidate.technologies.join(", ")}>
+                          <Typography variant="body2" noWrap>
+                            {candidate.technologies.join(", ")}
+                          </Typography>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Box
+                            sx={{
+                              width: 40,
+                              height: 20,
+                              backgroundColor:
+                                candidate.relevanceScore > 0.7
+                                  ? "success.light"
+                                  : candidate.relevanceScore > 0.4
+                                  ? "warning.light"
+                                  : "error.light",
+                              borderRadius: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Typography variant="caption" fontWeight="medium">
+                              {Math.round(candidate.relevanceScore)}%
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
