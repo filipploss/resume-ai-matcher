@@ -16,13 +16,9 @@ An AI-powered tool that analyzes and ranks resumes against job vacancies, helpin
 - **Frontend**: Next.js, React, Material UI, Tailwind CSS
 - **Backend**: Next.js API routes
 - **AI Integration**:
-  - Anthropic Claude API
   - OpenRouter API (supporting Llama 4 and other models)
+  - Anthropic Claude API
   - OpenAI API
-
-## Demo
-
-[View live demo](https://resume-ai-matcher.vercel.app) (coming soon)
 
 ## Getting Started
 
@@ -36,10 +32,10 @@ An AI-powered tool that analyzes and ranks resumes against job vacancies, helpin
 
 1. Clone the repository
 
-   ```bash
-   git clone https://github.com/yourusername/resume-ai-matcher.git
-   cd resume-ai-matcher
-   ```
+```bash
+ git clone https://github.com/yourusername/resume-ai-matcher.git
+ cd resume-ai-matcher
+```
 
 2. Install dependencies
 
@@ -51,7 +47,7 @@ An AI-powered tool that analyzes and ranks resumes against job vacancies, helpin
 
 3. Create a .env.local file with your API keys
 
-```
+```bash
 ANTHROPIC_API_KEY=your_anthropic_key
 OPENROUTER_API_KEY=your_openrouter_key
 
@@ -81,10 +77,11 @@ yarn dev
 
 ## Environment Variables
 
-| Variable                        | Description                                |
-| ------------------------------- | ------------------------------------------ |
-| `ANTHROPIC_API_KEY`             | API key for Anthropic's Claude models      |
-| `OPENROUTER_API_KEY`            | API key for OpenRouter (optional)          |
+| Variable                        | Description                                     |
+| ------------------------------- | ----------------------------------------------- |
+| `OPENROUTER_API_KEY`            | API key for OpenRouter                          |
+| `ANTHROPIC_API_KEY`             | API key for Anthropic's Claude models (optional)|
+
 
 ## How It Works
 
